@@ -3,11 +3,16 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <EnablePackageVersionOverride>false</EnablePackageVersionOverride>
   </PropertyGroup>
-  <!-- Packages for used features -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+  <!-- Packages for used features - for net462+, net48, and netstandard2.0 (they don't use Backports) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'netstandard2.0'">
     <PackageVersion Include="System.Memory" Version="4.6.0" />
-    <PackageVersion Include="System.ValueTuple" Version="4.4.0" />  <!-- Stay on 4.4.0, due to this package also is in the build extensions, and we cant change that  -->
+    <PackageVersion Include="System.ValueTuple" Version="4.4.0" />
     <PackageVersion Include="System.Collections.Immutable" Version="6.0.0" />
+  </ItemGroup>
+  <!-- Backports package for older frameworks -->
+  <ItemGroup>
+    <PackageVersion Include="FrameworkExtensions.Backports" Version="1.0.0.212" />
+    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
   </ItemGroup>
   <!-- General Packages -->
   <ItemGroup>
@@ -20,9 +25,12 @@
   <ItemGroup>
     <PackageVersion Include="IsExternalInit" Version="1.0.3" />
     <PackageVersion Include="Nullable" Version="1.3.1" />
+    <PackageVersion Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" Version="1.0.0-alpha.160" />
+  </ItemGroup>
+  <!-- Async packages - for net462+, net48, and netstandard2.0 (they don't use Backports) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'netstandard2.0'">
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    <PackageVersion Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" Version="1.0.0-alpha.160" />
   </ItemGroup>
   <!-- Analyzers -->
   <ItemGroup>
@@ -36,8 +44,12 @@
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.0" />
   </ItemGroup>
-  <!-- Explictily set the version of indirect referenced nuget packages -->
-  <ItemGroup>
+  <!-- Explictily set the version of indirect referenced nuget packages - only for net462+ -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR $(TargetFramework.StartsWith('netstandard')) OR $(TargetFramework.StartsWith('net5')) OR $(TargetFramework.StartsWith('net6')) OR $(TargetFramework.StartsWith('net7')) OR $(TargetFramework.StartsWith('net8')) OR $(TargetFramework.StartsWith('net9')) OR $(TargetFramework.StartsWith('net10'))">
     <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+  </ItemGroup>
+  <!-- Registry package for netstandard (NETFRAMEWORK has it built-in, net5.0+ has OperatingSystem.IsWindows checks) -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 </Project>

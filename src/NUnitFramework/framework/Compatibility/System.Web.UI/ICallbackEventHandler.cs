@@ -1,5 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+// Note: net20/net35 have System.Web.dll with the real ICallbackEventHandler,
+// so we only provide a shim for .NET Core/.NET 5+ which don't have System.Web
 #if !NETFRAMEWORK
 namespace System.Web.UI
 {

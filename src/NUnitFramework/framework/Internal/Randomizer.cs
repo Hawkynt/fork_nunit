@@ -773,11 +773,11 @@ namespace NUnit.Framework.Internal
         public Guid NextGuid()
         {
             //We use the algorithm described in https://tools.ietf.org/html/rfc4122#section-4.4
-#if NETFRAMEWORK
-            var b = new byte[16];
+#if SUPPORTS_SPAN
+            Span<byte> b = stackalloc byte[16];
             NextBytes(b);
 #else
-            Span<byte> b = stackalloc byte[16];
+            var b = new byte[16];
             NextBytes(b);
 #endif
             //set the version to 4
@@ -798,27 +798,27 @@ namespace NUnit.Framework.Internal
 
         private uint RawUInt32()
         {
-#if NETFRAMEWORK
-            var buffer = new byte[sizeof(uint)];
-            NextBytes(buffer);
-            return BitConverter.ToUInt32(buffer, 0);
-#else
+#if SUPPORTS_SPAN
             Span<byte> buffer = stackalloc byte[sizeof(uint)];
             NextBytes(buffer);
             return BitConverter.ToUInt32(buffer);
+#else
+            var buffer = new byte[sizeof(uint)];
+            NextBytes(buffer);
+            return BitConverter.ToUInt32(buffer, 0);
 #endif
         }
 
         private ulong RawUInt64()
         {
-#if NETFRAMEWORK
-            var buffer = new byte[sizeof(ulong)];
-            NextBytes(buffer);
-            return BitConverter.ToUInt64(buffer, 0);
-#else
+#if SUPPORTS_SPAN
             Span<byte> buffer = stackalloc byte[sizeof(ulong)];
             NextBytes(buffer);
             return BitConverter.ToUInt64(buffer);
+#else
+            var buffer = new byte[sizeof(ulong)];
+            NextBytes(buffer);
+            return BitConverter.ToUInt64(buffer, 0);
 #endif
         }
 

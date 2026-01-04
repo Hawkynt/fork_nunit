@@ -22,7 +22,11 @@ namespace NUnit.Framework.Internal
         [DoesNotReturn]
         public static void Rethrow(Exception exception)
         {
+#if SUPPORTS_EXCEPTION_SERVICES
             System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(exception).Throw();
+#else
+            throw exception;
+#endif
         }
 
         /// <summary>

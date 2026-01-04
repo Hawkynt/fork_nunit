@@ -145,7 +145,7 @@ namespace NUnit.Framework.Constraints
             return sb.ToString();
         }
 
-#if NETFRAMEWORK
+#if NETFRAMEWORK && !NET20 && !NET35
         [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
 #endif
         private static string FormatValueWithoutThrowing(object? val)

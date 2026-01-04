@@ -221,18 +221,38 @@ namespace NUnit.Framework.Internal
                 // These bitness tests relate to the process, not the OS.
                 case "64-BIT":
                 case "64-BIT-PROCESS":
+#if NET20 || NET35
+                    isSupported = IntPtr.Size == 8;
+#else
                     isSupported = Environment.Is64BitProcess;
+#endif
                     break;
                 case "32-BIT":
                 case "32-BIT-PROCESS":
+#if NET20 || NET35
+                    isSupported = IntPtr.Size != 8;
+#else
                     isSupported = !Environment.Is64BitProcess;
+#endif
                     break;
 
                 case "64-BIT-OS":
+#if NET20 || NET35
+                    // On older frameworks, we can only reliably detect if the process is 64-bit
+                    // If the process is 64-bit, the OS must be 64-bit
+                    // If 32-bit process, we can't reliably detect OS bitness without P/Invoke
+                    isSupported = IntPtr.Size == 8;
+#else
                     isSupported = Environment.Is64BitOperatingSystem;
+#endif
                     break;
                 case "32-BIT-OS":
+#if NET20 || NET35
+                    // Conservative: only say 32-bit OS if process is 32-bit (could be WoW64)
+                    isSupported = IntPtr.Size != 8;
+#else
                     isSupported = !Environment.Is64BitOperatingSystem;
+#endif
                     break;
 
                 default:

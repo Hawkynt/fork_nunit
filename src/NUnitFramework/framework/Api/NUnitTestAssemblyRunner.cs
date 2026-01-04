@@ -15,7 +15,7 @@ using NUnit.Framework.Internal.Abstractions;
 using NUnit.Framework.Internal.Extensions;
 using System.Threading.Tasks;
 
-#if NETFRAMEWORK
+#if SUPPORTS_WINFORMS
 using System.Windows.Forms;
 #endif
 
@@ -209,7 +209,9 @@ namespace NUnit.Framework.Api
             TopLevelWorkItem.InitializeContext(context);
 
             // Set exception handlers of last resort in case users start tasks but don't await them
+#if SUPPORTS_CONCURRENT
             TaskScheduler.UnobservedTaskException += OnUnobservedException;
+#endif
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
             TopLevelWorkItem.Completed += OnRunCompleted;
@@ -225,11 +227,13 @@ namespace NUnit.Framework.Api
             UnexpectedExceptionHandler("AppDomain.UnhandledException", (Exception)args.ExceptionObject);
         }
 
+#if SUPPORTS_CONCURRENT
         private static void OnUnobservedException(object? sender, UnobservedTaskExceptionEventArgs args)
         {
             UnexpectedExceptionHandler("TaskScheduler.UnobservedTaskException", args.Exception);
             args.SetObserved();
         }
+#endif
 
         private static void UnexpectedExceptionHandler(string originator, Exception e)
         {
@@ -317,7 +321,7 @@ namespace NUnit.Framework.Api
                 }
             }
 
-#if NETFRAMEWORK
+#if SUPPORTS_WINFORMS
             if (Settings.TryGetValue(FrameworkPackageSettings.PauseBeforeRun, out var pauseBeforeRun) &&
                 (bool)pauseBeforeRun)
             {
@@ -389,7 +393,9 @@ namespace NUnit.Framework.Api
 
             // Unhook exception handlers of last resort
             AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+#if SUPPORTS_CONCURRENT
             TaskScheduler.UnobservedTaskException -= OnUnobservedException;
+#endif
 
             _runComplete.Set();
         }
@@ -417,7 +423,7 @@ namespace NUnit.Framework.Api
                 : loadedTest.Properties.TryGet(PropertyNames.LevelOfParallelism, NUnitTestAssemblyRunner.DefaultLevelOfParallelism);
         }
 
-#if NETFRAMEWORK
+#if SUPPORTS_WINFORMS
         private static void PauseBeforeRun()
         {
             using var process = Process.GetCurrentProcess();

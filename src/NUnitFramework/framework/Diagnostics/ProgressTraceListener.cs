@@ -39,7 +39,7 @@ namespace NUnit.Framework.Diagnostics
     /// </para><para>
     /// This listener is provided by NUnit (i.e. the origin of
     /// <see cref="TestContext.Progress"/>) same as the
-    /// <see cref="ConsoleTraceListener"/> is provided by .NET
+    /// ConsoleTraceListener is provided by .NET
     /// (the origin of <see cref="Console"/>).
     /// </para></remarks>
     public class ProgressTraceListener : TextWriterTraceListener

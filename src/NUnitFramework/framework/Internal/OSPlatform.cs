@@ -514,7 +514,7 @@ namespace NUnit.Framework.Internal
         /// Gets a description for the current OS.
         /// </summary>
         public static string OSDescription =>
-#if NET462
+#if NET462 || NET20 || NET35 || NET40 || NET45
             LazyCurrentPlatform.Value.ToString();
 #else
             System.Runtime.InteropServices.RuntimeInformation.OSDescription;

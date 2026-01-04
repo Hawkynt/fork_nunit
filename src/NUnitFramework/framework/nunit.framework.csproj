@@ -9,17 +9,29 @@
     <NoWarn />
   </PropertyGroup>
 
+  <!-- Exclude NUnit's own polyfills when Backports provides them -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+    <Compile Remove="Internal\FormattableString.cs" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Title>NUnit Framework $(AssemblyConfiguration)</Title>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-    <PackageReference Include="System.Threading.Tasks.Extensions" />
+  <!-- System.Threading.Tasks.Extensions only supports net461+ -->
+  <!-- For net20/net35/net40/net45, Backports provides these types -->
+  <!-- For netstandard2.0, this is handled in Directory.Build.props -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48'">
     <PackageReference Include="System.ValueTuple" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+  <!-- System.Web is available on all .NET Framework versions -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net462'">
     <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <!-- System.Windows.Forms is available on net20+ but we only need it for net40+ where WinForms features are used -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net462'">
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 

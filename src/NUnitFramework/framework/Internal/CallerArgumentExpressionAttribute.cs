@@ -1,4 +1,5 @@
-#if !NET6_0_OR_GREATER
+// Skip this polyfill when Backports provides it, or when native .NET 6+ is used
+#if !NET6_0_OR_GREATER && !USES_BACKPORTS
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.

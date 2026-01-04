@@ -456,7 +456,7 @@ namespace NUnit.Framework.Interfaces
             /// </summary>
             public TNode this[int index]
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl((MethodImplOptions)256)]
                 get
                 {
                     if (_parent._childNodes is null || (uint)index >= (uint)_parent._childNodes.Count)
@@ -477,14 +477,14 @@ namespace NUnit.Framework.Interfaces
             /// </summary>
             public int Count
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl((MethodImplOptions)256)]
                 get => _parent._childNodes?.Count ?? 0;
             }
 
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
             /// </summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl((MethodImplOptions)256)]
             public List<TNode>.Enumerator GetEnumerator() => _parent._childNodes?.GetEnumerator() ?? EmptyList.GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -514,7 +514,7 @@ namespace NUnit.Framework.Interfaces
             /// <returns>Value of the attribute or null</returns>
             public string? this[string key]
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl((MethodImplOptions)256)]
                 get
                 {
                     string? value = null;
@@ -526,7 +526,7 @@ namespace NUnit.Framework.Interfaces
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
             /// </summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl((MethodImplOptions)256)]
             public Dictionary<string, string>.Enumerator GetEnumerator() => _parent._attributes?.GetEnumerator() ?? EmptyDictionary.GetEnumerator();
 
             /// <summary>
@@ -534,7 +534,7 @@ namespace NUnit.Framework.Interfaces
             /// </summary>
             public int Count
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl((MethodImplOptions)256)]
                 get => _parent._attributes?.Count ?? 0;
             }
         }

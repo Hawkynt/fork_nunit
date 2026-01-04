@@ -8,7 +8,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+#if SUPPORTS_SYSTEM_WEB
 using System.Web.UI;
+#endif
 using NUnit.Compatibility;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
@@ -199,6 +201,7 @@ namespace NUnit.Framework.Api
             return InsertChildElements(result).OuterXml;
         }
 
+#if SUPPORTS_SYSTEM_WEB
         private class ActionCallback : ICallbackEventHandler
         {
             private readonly Action<string> _callback;
@@ -245,6 +248,7 @@ namespace NUnit.Framework.Api
 
             Runner.RunAsync(new TestProgressReporter(handler), TestFilter.FromXml(filter));
         }
+#endif
 
         /// <summary>
         /// Stops the test run
@@ -267,6 +271,7 @@ namespace NUnit.Framework.Api
 
         #endregion
 
+#if SUPPORTS_SYSTEM_WEB
         #region Private Action Methods Used by Nested Classes
 
         private void LoadTests(ICallbackEventHandler handler)
@@ -303,6 +308,11 @@ namespace NUnit.Framework.Api
         {
             handler.RaiseCallbackEvent(CountTests(filter).ToString());
         }
+
+        #endregion
+#endif
+
+        #region Helper Methods
 
         /// <summary>
         /// Inserts the environment and settings elements
@@ -424,6 +434,7 @@ namespace NUnit.Framework.Api
 
         #endregion
 
+#if SUPPORTS_SYSTEM_WEB
         #region LoadTestsAction
 
         /// <summary>
@@ -551,6 +562,7 @@ namespace NUnit.Framework.Api
         }
 
         #endregion
+#endif
 
         #endregion
     }

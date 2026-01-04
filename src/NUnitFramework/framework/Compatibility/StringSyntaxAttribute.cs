@@ -1,6 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NET7_0_OR_GREATER
+// Skip this polyfill when Backports provides it, or when native .NET 7+ is used
+#if !NET7_0_OR_GREATER && !USES_BACKPORTS
 
 namespace System.Diagnostics.CodeAnalysis
 {

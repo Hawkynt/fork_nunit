@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if SUPPORTS_SYSTEM_WEB
 using System;
 using System.IO;
 using System.Text;
@@ -198,3 +199,4 @@ namespace NUnit.Framework.Internal
         #endregion
     }
 }
+#endif

@@ -240,7 +240,7 @@ namespace NUnit.Framework.Constraints
             {
                 if (type.FullName().StartsWith("System.Collections.Generic.IEnumerable`1", StringComparison.Ordinal))
                 {
-                    return type.GenericTypeArguments[0];
+                    return type.GetGenericArguments()[0];
                 }
             }
 

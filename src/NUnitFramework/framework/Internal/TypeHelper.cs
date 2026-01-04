@@ -278,7 +278,11 @@ namespace NUnit.Framework.Internal
                     }
                 }
 
+#if NET20 || NET35 || NET40
+                return primaryEnumerableType?.GetGenericArguments()[0];
+#else
                 return primaryEnumerableType?.GenericTypeArguments[0];
+#endif
             }
 
             /// <summary>

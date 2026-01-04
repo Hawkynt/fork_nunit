@@ -253,7 +253,7 @@ namespace NUnit.Framework.Internal
         /// <param name="fixture">The object on which to invoke the method</param>
         /// <param name="args">The argument list for the method</param>
         /// <returns>The return value from the invoked method</returns>
-#if NETFRAMEWORK
+#if NETFRAMEWORK && !NET20 && !NET35
         [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions] //put here to handle C++ exceptions.
 #endif
         public static object? InvokeMethod(MethodInfo method, object? fixture, params object?[]? args)

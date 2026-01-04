@@ -3,7 +3,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-#if !NETFRAMEWORK
+#if NET5_0_OR_GREATER
 using System.Runtime.Loader;
 #endif
 
@@ -75,7 +75,7 @@ namespace NUnit.Framework.Internal
 
         #region Load
 
-#if !NETFRAMEWORK
+#if NET5_0_OR_GREATER
         private sealed class ReflectionAssemblyLoader
         {
             private static ReflectionAssemblyLoader? _instance;

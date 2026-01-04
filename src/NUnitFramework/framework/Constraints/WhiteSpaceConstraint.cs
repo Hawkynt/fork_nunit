@@ -22,7 +22,24 @@ namespace NUnit.Framework.Constraints
         /// <returns>True for success, false for failure</returns>
         protected override bool Matches(string? actual)
         {
+#if NET20 || NET35
+            if (actual is null)
+            {
+                return true;
+            }
+
+            for (var i = 0; i < actual.Length; ++i)
+            {
+                if (!char.IsWhiteSpace(actual[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+#else
             return string.IsNullOrWhiteSpace(actual);
+#endif
         }
     }
 }

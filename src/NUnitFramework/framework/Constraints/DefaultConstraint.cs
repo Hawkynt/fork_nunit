@@ -1,6 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace NUnit.Framework.Constraints
 {
@@ -17,7 +17,7 @@ namespace NUnit.Framework.Constraints
         /// </summary>
         public override ConstraintResult ApplyTo<TActual>(TActual actual)
         {
-            var isDefault = RuntimeHelpers.Equals(actual, default(TActual));
+            var isDefault = EqualityComparer<TActual>.Default.Equals(actual, default!);
             return new ConstraintResult(this, actual, isDefault);
         }
     }

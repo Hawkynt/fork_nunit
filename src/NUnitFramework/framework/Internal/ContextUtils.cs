@@ -29,6 +29,20 @@ namespace NUnit.Framework.Internal
                 var executionContext = ExecutionContext.Capture()
                     ?? throw new InvalidOperationException("Execution context flow must not be suppressed.");
 
+#if NET20 || NET35 || NET40
+                // ExecutionContext doesn't implement IDisposable on older frameworks
+                ExecutionContext.Run(executionContext, s =>
+                {
+                    // For NET Framework, we need to set the current context inside the execution context
+                    // For NET Core we can set it outside the execution context
+
+                    // Set up a SynchronizationContext to catch posted exceptions
+                    SynchronizationContext.SetSynchronizationContext(
+                        SafeSynchronizationContext.Create(synchronizationContext, TestExecutionContext.CurrentContext));
+
+                    callback(s);
+                }, state);
+#else
                 using (executionContext)
                 {
                     ExecutionContext.Run(executionContext, s =>
@@ -43,6 +57,7 @@ namespace NUnit.Framework.Internal
                         callback(s);
                     }, state);
                 }
+#endif
             }
             finally
             {

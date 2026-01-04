@@ -9,7 +9,11 @@ namespace NUnit.Framework.Internal.ExecutionHooks
     {
         private readonly List<Action<HookData>> _list;
 
+#if NET20 || NET35 || NET40
+        protected override ICollection<Action<HookData>> Handlers => _list;
+#else
         protected override IReadOnlyCollection<Action<HookData>> Handlers => _list;
+#endif
 
         internal override void AddHandler(Action<HookData> handler) => _list.Add(handler);
 

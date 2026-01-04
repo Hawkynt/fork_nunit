@@ -1,0 +1,124 @@
+<Project>
+
+  <!--
+    Framework-specific feature flags for NUnit multi-targeting.
+    These flags control conditional compilation for APIs that are not available on all platforms.
+
+    Note: Async (Task, async/await) IS available on all frameworks via Backports polyfills.
+  -->
+
+  <!-- Detect .NET Framework vs .NET Core/.NET 5+ -->
+  <PropertyGroup>
+    <IsNetFramework Condition="$(TargetFramework.StartsWith('net2')) OR $(TargetFramework.StartsWith('net3')) OR $(TargetFramework.StartsWith('net4'))">true</IsNetFramework>
+    <IsNetStandard Condition="$(TargetFramework.StartsWith('netstandard'))">true</IsNetStandard>
+    <IsNetCore Condition="$(TargetFramework.StartsWith('netcoreapp')) OR ($(TargetFramework.StartsWith('net')) AND !$(TargetFramework.StartsWith('net2')) AND !$(TargetFramework.StartsWith('net3')) AND !$(TargetFramework.StartsWith('net4')) AND !$(TargetFramework.StartsWith('netstandard')))">true</IsNetCore>
+  </PropertyGroup>
+
+  <!-- Define NETSTANDARD symbol for netstandard targets (not defined by SDK by default) -->
+  <PropertyGroup Condition="'$(IsNetStandard)' == 'true'">
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Define explicit version symbols for old .NET Framework (SDK doesn't define these) -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20'">
+    <DefineConstants>$(DefineConstants);NET20</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net35'">
+    <DefineConstants>$(DefineConstants);NET35</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net40'">
+    <DefineConstants>$(DefineConstants);NET40</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Thread.Abort support - only on .NET Framework -->
+  <PropertyGroup Condition="'$(IsNetFramework)' == 'true'">
+    <DefineConstants>$(DefineConstants);THREAD_ABORT</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Span<T> and Memory<T> support
+       Native: netstandard2.1+, netcoreapp2.1+
+       Note: Backports provides Span polyfill, but extension method resolution for Random.NextBytes(Span)
+       doesn't work from derived classes when base class has NextBytes(byte[]). So we don't enable
+       SUPPORTS_SPAN for older frameworks to avoid these issues. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1' OR '$(IsNetCore)' == 'true'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_SPAN</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Nullable reference types annotations - net6.0+ only have full support -->
+  <PropertyGroup Condition="'$(IsNetCore)' == 'true'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_NULLABLE_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+
+  <!-- System.Web support - net20/net35 use shim from Compatibility folder, net40+ uses real System.Web -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net462'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_SYSTEM_WEB</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Windows Forms support - net40+ only (SynchronizationContext features) -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net462'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_WINFORMS</DefineConstants>
+  </PropertyGroup>
+
+  <!-- ConcurrentDictionary and concurrent collections
+       Native: net40+, netstandard, netcore
+       Backports: net20, net35 (polyfilled) -->
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);SUPPORTS_CONCURRENT</DefineConstants>
+  </PropertyGroup>
+
+  <!-- MethodImplOptions.AggressiveInlining
+       Native: net45+, netstandard, netcore
+       Backports: net20-net40 (polyfilled) -->
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);SUPPORTS_INLINING</DefineConstants>
+  </PropertyGroup>
+
+  <!-- ExceptionDispatchInfo - net45+ and all netstandard/netcore -->
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net20' AND '$(TargetFramework)' != 'net35' AND '$(TargetFramework)' != 'net40'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_EXCEPTION_SERVICES</DefineConstants>
+  </PropertyGroup>
+
+  <!-- ValueTask support
+       Native: netstandard2.1+, netcoreapp2.1+
+       Backports: net20-net45 (polyfilled via USES_BACKPORTS)
+       Note: net462/net48/netstandard2.0 don't use Backports -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1' OR '$(IsNetCore)' == 'true'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_VALUETASK</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_VALUETASK</DefineConstants>
+  </PropertyGroup>
+
+  <!-- IAsyncEnumerable support
+       Native: netstandard2.1+, netcoreapp3.0+
+       Backports: net20-net45 (polyfilled via USES_BACKPORTS)
+       Note: net462/net48/netstandard2.0 don't use Backports -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1' OR '$(IsNetCore)' == 'true'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_ASYNC_ENUMERABLE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_ASYNC_ENUMERABLE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Half type support
+       Native: net5.0+
+       Backports: net20-net45 (polyfilled via USES_BACKPORTS)
+       Note: net462/net48/netstandard don't use Backports -->
+  <PropertyGroup Condition="'$(IsNetCore)' == 'true'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_HALF</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+    <DefineConstants>$(DefineConstants);SUPPORTS_HALF</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Backports package provides polyfills for these frameworks -->
+  <!-- Do NOT define NUnit's internal polyfills when Backports provides them -->
+  <!-- Note: net462/net48 and netstandard excluded as Backports conflicts with their base libraries -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+    <DefineConstants>$(DefineConstants);USES_BACKPORTS</DefineConstants>
+  </PropertyGroup>
+
+</Project>

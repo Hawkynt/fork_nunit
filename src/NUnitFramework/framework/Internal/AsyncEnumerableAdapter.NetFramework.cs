@@ -1,5 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
-#if NETFRAMEWORK
+#if NETFRAMEWORK && !NET20 && !NET35
 
 using System;
 using System.Collections;

@@ -3,12 +3,15 @@
   <PropertyGroup>
     <LangVersion Condition="'$(MSBuildProjectExtension)' == '.csproj'">14</LangVersion>
     <Features>strict</Features>
-    <SignAssembly>true</SignAssembly>
+    <!-- Signing is disabled for net20/net35/net40/net45 because Backports is not signed -->
+    <SignAssembly Condition="'$(TargetFramework)' != 'net20' AND '$(TargetFramework)' != 'net35' AND '$(TargetFramework)' != 'net40' AND '$(TargetFramework)' != 'net45'">true</SignAssembly>
+    <SignAssembly Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">false</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\nunit.snk</AssemblyOriginatorKeyFile>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <NUnitLibraryFrameworks>net462;net6.0;net8.0</NUnitLibraryFrameworks>
-    <NUnitRuntimeFrameworks>net462;net6.0;net8.0;net9.0;net10.0</NUnitRuntimeFrameworks>
+    <!-- net20 uses Backports for Task, async/await, LINQ, etc. -->
+    <NUnitLibraryFrameworks>net20;net48;net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</NUnitLibraryFrameworks>
+    <NUnitRuntimeFrameworks>net20;net48;net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</NUnitRuntimeFrameworks>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <!--<OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>-->
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
@@ -36,9 +39,21 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <DefineConstants Condition="$(TargetFramework.StartsWith('net4'))">$(DefineConstants);THREAD_ABORT</DefineConstants>
+  <!-- Suppress nullability warnings on netstandard - BCL lacks proper annotations -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS8602;CS8604;CS8762;CS8763</WarningsNotAsErrors>
   </PropertyGroup>
+
+  <!-- Suppress CLS compliance warnings on net20 - Backports polyfill types are not CLS-compliant -->
+  <!-- Also suppress nullable warnings and analyzer warnings on net20/net35 - BCL lacks proper annotations -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35'">
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS3001;CS3002;CS3003;CS8602;CS8604;CS8762;CS8763;CS8601;CS8603;CS1685</WarningsNotAsErrors>
+    <!-- Disable analyzers that don't understand Backports LINQ -->
+    <NoWarn>$(NoWarn);IDE0005</NoWarn>
+  </PropertyGroup>
+
+  <!-- Import version-specific feature flags -->
+  <Import Project="$(MSBuildThisFileDirectory)VersionSpecificSymbols.props" />
 
   <!-- We always want a good debugging experience in tests -->
   <PropertyGroup>
@@ -49,9 +64,44 @@
   </PropertyGroup>
 
   <Choose>
+    <When Condition="'$(TargetFramework)' == 'net20'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Framework 2.0 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net35'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Framework 3.5 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net40'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Framework 4.0 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net45'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Framework 4.5 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net48'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Framework 4.8 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
     <When Condition="'$(TargetFramework)' == 'net462'">
       <PropertyGroup>
         <AssemblyConfiguration>.NET Framework 4.6.2 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Standard 2.0 $(Configuration)</AssemblyConfiguration>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.1'">
+      <PropertyGroup>
+        <AssemblyConfiguration>.NET Standard 2.1 $(Configuration)</AssemblyConfiguration>
       </PropertyGroup>
     </When>
     <When Condition="$(TargetFramework.StartsWith('net6.0'))">
@@ -86,8 +136,12 @@
     <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" PrivateAssets="all" />
     <PackageReference Include="IsExternalInit" PrivateAssets="all" />
-    <PackageReference Include="Nullable" PrivateAssets="all" />
     <PackageReference Include="CSharpIsNullAnalyzer" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Nullable package for net6.0+, net462/net48, and netstandard (Backports conflicts on these) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1' OR $(TargetFramework.StartsWith('net6')) OR $(TargetFramework.StartsWith('net7')) OR $(TargetFramework.StartsWith('net8')) OR $(TargetFramework.StartsWith('net9')) OR $(TargetFramework.StartsWith('net10'))">
+    <PackageReference Include="Nullable" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,6 +152,50 @@
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[$(AnnotatedReferenceAssemblyVersion)]" />
     <PackageReference Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Backports for older .NET Framework - provides Task, async/await, LINQ, etc. -->
+  <!-- Use ProjectReference to local Backports for development -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\..\Framework (Extensions)\Backports\Backports.csproj" />
+  </ItemGroup>
+
+  <!--
+    For ProjectReference scenarios, import Backports build targets if they exist for the target framework.
+    This provides compiler attributes like ExtensionAttribute for older frameworks.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\Framework (Extensions)\Backports\build\$(TargetFramework)\FrameworkExtensions.Backports.targets"
+          Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\Framework (Extensions)\Backports\build\$(TargetFramework)\FrameworkExtensions.Backports.targets')" />
+
+  <!-- Reference assemblies for older .NET Framework versions -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Allow building on non-Windows platforms for Windows-targeted frameworks -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net462'">
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <!-- Suppress TFM support build errors for older frameworks -->
+  <PropertyGroup>
+    <SuppressTfmSupportBuildErrors>true</SuppressTfmSupportBuildErrors>
+  </PropertyGroup>
+
+  <!-- Registry package for netstandard (NETFRAMEWORK has it built-in) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="Microsoft.Win32.Registry" />
+  </ItemGroup>
+
+  <!-- System.Memory for netstandard2.0 (netstandard2.1 has native Span support) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" />
+  </ItemGroup>
+
+  <!-- Async packages for net462, net48, and netstandard2.0 (they don't use Backports) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Threading.Tasks.Extensions" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
   </ItemGroup>
 
 </Project>

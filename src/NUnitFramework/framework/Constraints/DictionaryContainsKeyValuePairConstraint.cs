@@ -77,7 +77,7 @@ namespace NUnit.Framework.Constraints
                 {
                     if (@interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     {
-                        var enumerableInnerType = @interface.GenericTypeArguments[0];
+                        var enumerableInnerType = @interface.GetGenericArguments()[0];
                         if (enumerableInnerType.IsGenericType && enumerableInnerType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
                         {
                             return true;

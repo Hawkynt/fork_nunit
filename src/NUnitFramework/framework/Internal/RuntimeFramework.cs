@@ -357,7 +357,10 @@ namespace NUnit.Framework.Internal
                 {
                     return IsNetCore_Internal();
                 }
-                catch (TypeLoadException) { }
+                catch (TypeLoadException)
+                {
+                    // Expected on .NET Framework when trying to check .NET Core APIs
+                }
             }
 #endif
 

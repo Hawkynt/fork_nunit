@@ -26,10 +26,10 @@ namespace NUnit.Framework.Internal.Filters
         /// </summary>
         public uint PartitionCount { get; private set; }
 
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETSTANDARD
         private readonly ThreadLocal<SHA256> _sha256 = new(() => SHA256.Create());
         private readonly ThreadLocal<byte[]> _buffer = new(() => new byte[4096]);
-#else
+#elif NET5_0_OR_GREATER
         private readonly ThreadLocal<byte[]> _buffer = new(() => GC.AllocateUninitializedArray<byte>(4096));
 #endif
         private readonly ThreadLocal<Encoder> _encoder = new(() => Encoding.UTF8.GetEncoder());
@@ -115,14 +115,14 @@ namespace NUnit.Framework.Internal.Filters
         /// </summary>
         private uint ComputeHashValue(string name)
         {
-#if NETFRAMEWORK
+#if NETFRAMEWORK || NETSTANDARD
             var buffer = _buffer.Value!;
             _encoder.Value!.Convert(name.ToCharArray(), 0, name.Length, buffer, 0, buffer.Length, flush: true, out _, out var bytesWritten, out _);
 
             var hashValue = _sha256.Value!.ComputeHash(buffer, 0, bytesWritten);
 
             return BitConverter.ToUInt32(hashValue, 0);
-#else
+#elif NET5_0_OR_GREATER
             Span<byte> buffer = _buffer.Value;
             _encoder.Value!.Convert(name.AsSpan(), buffer, flush: true, out _, out var bytesWritten, out _);
 
