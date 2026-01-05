@@ -11,7 +11,7 @@
   </ItemGroup>
   <!-- Backports package for older frameworks -->
   <ItemGroup>
-    <PackageVersion Include="FrameworkExtensions.Backports" Version="1.0.0.212" />
+    <PackageVersion Include="FrameworkExtensions.Backports" Version="1.0.0.231" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
   </ItemGroup>
   <!-- General Packages -->

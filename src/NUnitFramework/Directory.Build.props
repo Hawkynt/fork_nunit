@@ -155,17 +155,9 @@
   </ItemGroup>
 
   <!-- Backports for older .NET Framework - provides Task, async/await, LINQ, etc. -->
-  <!-- Use ProjectReference to local Backports for development -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\..\Framework (Extensions)\Backports\Backports.csproj" />
+    <PackageReference Include="FrameworkExtensions.Backports" />
   </ItemGroup>
-
-  <!--
-    For ProjectReference scenarios, import Backports build targets if they exist for the target framework.
-    This provides compiler attributes like ExtensionAttribute for older frameworks.
-  -->
-  <Import Project="$(MSBuildThisFileDirectory)..\..\..\Framework (Extensions)\Backports\build\$(TargetFramework)\FrameworkExtensions.Backports.targets"
-          Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\Framework (Extensions)\Backports\build\$(TargetFramework)\FrameworkExtensions.Backports.targets')" />
 
   <!-- Reference assemblies for older .NET Framework versions -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45' OR '$(TargetFramework)' == 'net48'">
