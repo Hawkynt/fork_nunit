@@ -66,7 +66,7 @@ namespace NUnit.TestData.AttributeThrowingExceptionFixture
                 throw new ArgumentNullException(nameof(message));
             }
 
-            Message = message;
+            Message = message!;
         }
 
         public string Message { get; }

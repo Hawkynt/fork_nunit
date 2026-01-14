@@ -2,6 +2,8 @@
 
 using System.Runtime.CompilerServices;
 
+// For signed assemblies (net462+, net48, netstandard, netcore)
+#if !NET20 && !NET35 && !NET40 && !NET45
 [assembly: InternalsVisibleTo("nunitlite.tests, PublicKey=002400000480000094" +
                               "000000060200000024000052534131000400000100010031eea" +
                               "370b1984bfa6d1ea760e1ca6065cee41a1a279ca234933fe977" +
@@ -9,3 +11,7 @@ using System.Runtime.CompilerServices;
                               "80799d6eeef61c98abd18767827dc05daea6b6fbd2e868410d9" +
                               "bee5e972a004ddd692dec8fa404ba4591e847a8cf35de21c2d3" +
                               "723bc8d775a66b594adeb967537729fe2a446b548cd57a6")]
+#else
+// For unsigned assemblies (net20, net35, net40, net45 - Backports is not signed)
+[assembly: InternalsVisibleTo("nunitlite.tests")]
+#endif

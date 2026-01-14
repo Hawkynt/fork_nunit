@@ -3,7 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnitLite.Tests</RootNamespace>
-    <TargetFrameworks>$(NUnitRuntimeFrameworks)</TargetFrameworks>
+    <!-- Exclude net20/net35/net40/net45 due to InternalsVisibleTo signing and missing Func<> infrastructure -->
+    <TargetFrameworks>net48;net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>disable</Nullable>
     <Title>NUnitLite Runner Tests</Title>
   </PropertyGroup>

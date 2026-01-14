@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>$(NUnitRuntimeFrameworks)</TargetFrameworks>
+        <!-- Exclude net20 due to missing async infrastructure, System.Xml.Linq, etc. -->
+        <TargetFrameworks>net48;net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
         <RootNamespace>NUnit.Framework.Tests</RootNamespace>
 
         <!-- Either NUnit or NUnitLite is not loading assemblies in a way that properly respects the
@@ -18,9 +19,20 @@
         <PackageReference Include="NUnit.Analyzers" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <!-- System.Collections.Immutable and System.ValueTuple for older frameworks -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48'">
         <PackageReference Include="System.Collections.Immutable" />
         <PackageReference Include="System.ValueTuple" />
+    </ItemGroup>
+
+    <!-- System.Collections.Immutable for netstandard2.x (not built-in) -->
+    <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+        <PackageReference Include="System.Collections.Immutable" />
+    </ItemGroup>
+
+    <!-- System.CodeDom for netstandard (needed for TestCompiler) -->
+    <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
+        <PackageReference Include="System.CodeDom" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,12 +40,17 @@
         <ProjectReference Include="..\slow-tests\slow-nunit-tests.csproj" />
         <ProjectReference Include="..\testdata\nunit.testdata.csproj" />
         <ProjectReference Include="..\mock-assembly\mock-assembly.csproj" />
-        <ProjectReference Include="..\testdata.fsharp\nunit.testdata.fsharp.fsproj" />
         <ProjectReference Include="..\nunitlite-runner\nunitlite-runner.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <!-- F# test data excluded from net20 because FSharp.Core doesn't support it -->
+    <ItemGroup Condition="'$(TargetFramework)' != 'net20'">
+        <ProjectReference Include="..\testdata.fsharp\nunit.testdata.fsharp.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48'">
         <Reference Include="System.Web" />
+        <Reference Include="System.IO.Compression" />
     </ItemGroup>
 
     <ItemGroup>

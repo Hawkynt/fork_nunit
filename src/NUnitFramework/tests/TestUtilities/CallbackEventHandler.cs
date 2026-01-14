@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if SUPPORTS_SYSTEM_WEB
 namespace NUnit.Framework.Tests.TestUtilities
 {
     public class CallbackEventHandler : System.Web.UI.ICallbackEventHandler
@@ -19,3 +20,4 @@ namespace NUnit.Framework.Tests.TestUtilities
         }
     }
 }
+#endif

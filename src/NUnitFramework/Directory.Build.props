@@ -30,6 +30,8 @@
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- Ideally this is always enabled, but that tends to hurt developer productivity -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- NU1701: NUnit3TestAdapter doesn't target netstandard but works at runtime -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1701</WarningsNotAsErrors>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -40,8 +42,10 @@
   </PropertyGroup>
 
   <!-- Suppress nullability warnings on netstandard - BCL lacks proper annotations -->
+  <!-- Also suppress NU1701 for NUnit3TestAdapter which doesn't target netstandard -->
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
     <WarningsNotAsErrors>$(WarningsNotAsErrors);CS8602;CS8604;CS8762;CS8763</WarningsNotAsErrors>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 
   <!-- Suppress CLS compliance warnings on net20 - Backports polyfill types are not CLS-compliant -->
@@ -155,7 +159,11 @@
   </ItemGroup>
 
   <!-- Backports for older .NET Framework - provides Task, async/await, LINQ, etc. -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45'">
+  <!-- Use ProjectReference when building with local Framework (Polyfills) to avoid version conflicts -->
+  <ItemGroup Condition="('$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45') AND Exists('$(MSBuildThisFileDirectory)..\..\..\Framework (Polyfills)\Backports\Backports.csproj')">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\..\Framework (Polyfills)\Backports\Backports.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'net20' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40' OR '$(TargetFramework)' == 'net45') AND !Exists('$(MSBuildThisFileDirectory)..\..\..\Framework (Polyfills)\Backports\Backports.csproj')">
     <PackageReference Include="FrameworkExtensions.Backports" />
   </ItemGroup>
 

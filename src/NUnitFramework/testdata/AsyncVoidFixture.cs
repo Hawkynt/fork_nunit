@@ -1,5 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+// async void requires AsyncVoidMethodBuilder which is not available in net20 via Backports
+#if !NET20
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,3 +33,4 @@ namespace NUnit.Framework.Tests
         }
     }
 }
+#endif

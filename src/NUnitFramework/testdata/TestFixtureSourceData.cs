@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+#if !NET20
 using NUnit.TestData.TestUtilities;
+#endif
 
 namespace NUnit.TestData.TestFixtureSourceData
 {
@@ -109,6 +111,7 @@ namespace NUnit.TestData.TestFixtureSourceData
         }
     }
 
+#if !NET20
     [TestFixtureSource(nameof(StaticAsyncEnumerableMethod))]
     public class StaticAsyncEnumerableMethod_SameClass : TestFixtureSourceTest
     {
@@ -136,6 +139,7 @@ namespace NUnit.TestData.TestFixtureSourceData
             return Task.FromResult(result.AsAsyncEnumerable());
         }
     }
+#endif
 
     [TestFixtureSource(nameof(InstanceField))]
     public class InstanceField_SameClass : TestFixtureSourceTest

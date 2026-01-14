@@ -3,8 +3,8 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <EnablePackageVersionOverride>false</EnablePackageVersionOverride>
   </PropertyGroup>
-  <!-- Packages for used features - for net462+, net48, and netstandard2.0 (they don't use Backports) -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'netstandard2.0'">
+  <!-- Packages for used features - for net462+, net48, and netstandard2.x (they don't use Backports) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR $(TargetFramework.StartsWith('netstandard'))">
     <PackageVersion Include="System.Memory" Version="4.6.0" />
     <PackageVersion Include="System.ValueTuple" Version="4.4.0" />
     <PackageVersion Include="System.Collections.Immutable" Version="6.0.0" />
@@ -18,7 +18,8 @@
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+    <!-- NoWarn NU1701: NUnit3TestAdapter doesn't target netstandard but works at runtime -->
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" NoWarn="NU1701" />
     <PackageVersion Include="FSharp.Core" Version="8.0.400" />
   </ItemGroup>
   <!-- Package to allow Nullability etc. in older SDKS -->
@@ -27,8 +28,8 @@
     <PackageVersion Include="Nullable" Version="1.3.1" />
     <PackageVersion Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" Version="1.0.0-alpha.160" />
   </ItemGroup>
-  <!-- Async packages - for net462+, net48, and netstandard2.0 (they don't use Backports) -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'netstandard2.0'">
+  <!-- Async packages - for net462+, net48, and netstandard2.x (they don't use Backports) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR $(TargetFramework.StartsWith('netstandard'))">
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
   </ItemGroup>
@@ -43,6 +44,7 @@
   <!-- Specific dependencies -->
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.0" />
+    <PackageVersion Include="System.CodeDom" Version="8.0.0" />
   </ItemGroup>
   <!-- Explictily set the version of indirect referenced nuget packages - only for net462+ -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net48' OR $(TargetFramework.StartsWith('netstandard')) OR $(TargetFramework.StartsWith('net5')) OR $(TargetFramework.StartsWith('net6')) OR $(TargetFramework.StartsWith('net7')) OR $(TargetFramework.StartsWith('net8')) OR $(TargetFramework.StartsWith('net9')) OR $(TargetFramework.StartsWith('net10'))">

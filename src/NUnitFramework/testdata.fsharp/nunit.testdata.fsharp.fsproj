@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>$(NUnitRuntimeFrameworks)</TargetFrameworks>
+    <!-- Exclude net20 because FSharp.Core doesn't support it -->
+    <TargetFrameworks>net48;net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Deterministic>false</Deterministic>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>

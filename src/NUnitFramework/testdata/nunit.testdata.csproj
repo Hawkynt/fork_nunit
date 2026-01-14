@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.TestData</RootNamespace>
-    <TargetFrameworks>$(NUnitRuntimeFrameworks)</TargetFrameworks>
+    <!-- Exclude net20 due to missing async infrastructure (AsyncVoidMethodBuilder, etc.) -->
+    <TargetFrameworks>net48;net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Optimize>false</Optimize>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
